@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
   // be sure to include its associated Products
   try {
     const categoryData = await Category.findAll({
-      include: [{ model: Product, model: Category }]
+      include: [{ model: Product }]
     });
     res.status(200).json(categoryData);
   } catch (err) {
@@ -16,9 +16,25 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   // find one category by its `id` value
   // be sure to include its associated Products
+  try {
+    // findByPk searches for a single instance by its primary key.
+    // This applies LIMIT 1, so the listener will always be called with a single instance.
+    const categoryData = await Category.findByPk(req.params.id, {
+      include: [{ model: Product }]
+    });
+
+    if (!categoryData) {
+      res.status(404).json({ message: 'No category found!' });
+      return;
+    }
+
+    res.status(200).json(categoryData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 router.post('/', async (req, res) => {
