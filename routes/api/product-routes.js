@@ -9,6 +9,7 @@ router.get('/', async (req, res) => {
   // be sure to include its associated Category and Tag data
   try {
     const productData = await Product.findAll({
+      // Search for multiple instances.
       include: [{ model: Category }, { model: Tag }]
     });
     res.status(200).json(productData);
@@ -23,6 +24,7 @@ router.get('/:id', async (req, res) => {
   // be sure to include its associated Category and Tag data
   try {
     const productData = await Product.findByPk(req.params.id, {
+      // Search for a single instance by its primary key. This applies LIMIT 1, so the listener will always be called with a single instance.
       include: [{ model: Category }, { model: Tag }]
     });
 
@@ -51,13 +53,17 @@ router.post('/', (req, res) => {
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
       if (req.body.tagIds.length) {
-        const productTagIdArr = req.body.tagIds.map((tag_id) => {
+        const productTagIdArray = req.body.tagIds.map((tag_id) => {
           return {
             product_id: product.id,
-            tag_id: Tag.id,
+            tag_id,
           };
         });
-        return ProductTag.bulkCreate(productTagIdArr);
+        return ProductTag.bulkCreate(productTagIdArray);
+        // Create and insert multiple instances in bulk.
+        // The success handler is passed an array of instances, but please notice that these may not completely represent the state of the rows in the DB.
+        // This is because MySQL and SQLite do not make it easy to obtain back automatically generated IDs and other default values in a way that can be mapped to multiple records.
+        // To obtain Instances for the newly created values, you will need to query for them again.
       }
       // if no product tags, just respond
       res.status(200).json(product);
