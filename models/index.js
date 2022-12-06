@@ -15,6 +15,7 @@ Product.belongsTo(Category, {
 Category.hasMany(Product, {
   foreignKey: 'category_id',
   onDelete: 'CASCADE',
+  // CASCADE option specifies that rows in a child table will be deleted when corresponding rows are deleted in the parent table
 });
 
 // Products belongToMany Tags (through ProductTag)
@@ -23,7 +24,6 @@ Product.belongsToMany(Tag, {
     model: ProductTag,
     unique: false
   },
-  as: 'products'
 });
 
 // Tags belongToMany Products (through ProductTag)
@@ -32,7 +32,6 @@ Tag.belongsToMany(Product, {
     model: ProductTag,
     unique: false
   },
-  as: 'tags'
 });
 
 module.exports = {
